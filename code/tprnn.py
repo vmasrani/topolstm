@@ -71,7 +71,7 @@ def init_tparams(params):
     Set up Theano shared variables.
     '''
     tparams = OrderedDict()
-    for kk, pp in params.items():
+    for kk, pp in list(params.items()):
         tparams[kk] = theano.shared(params[kk], name=kk)
     return tparams
 
@@ -81,14 +81,14 @@ def unzip(zipped):
     When we pickle the model. Needed for the GPU stuff.
     """
     new_params = OrderedDict()
-    for kk, vv in zipped.items():
+    for kk, vv in list(zipped.items()):
         new_params[kk] = vv.get_value()
     return new_params
 
 
 def load_params(path, params):
     pp = np.load(path)
-    for kk, vv in params.items():
+    for kk, vv in list(params.items()):
         if kk not in pp:
             raise Warning('%s is not in the archive' % kk)
         params[kk] = pp[kk]
@@ -149,35 +149,35 @@ def train(data_dir='data/memes/',
 
     # loads graph
     G, node_index = data_utils.load_graph(data_dir)
-    print nx.info(G)
+    print(nx.info(G))
     options['n_words'] = len(node_index)
 
-    print options
+    print(options)
 
     # creates and initializes shared variables.
-    print 'Initializing variables...'
+    print('Initializing variables...')
     params = init_params(options)
     if reload_model:
-        print 'reusing saved model.'
+        print('reusing saved model.')
         load_params(saveto, params)
     tparams = init_tparams(params)
 
     # builds Topo-LSTM model
-    print 'Building model...'
+    print('Building model...')
     model = tprnn_model.build_model(tparams, options)
 
-    print 'Loading test data...'
+    print('Loading test data...')
     test_examples = data_utils.load_examples(data_dir,
                                              dataset='test',
                                              node_index=node_index,
                                              maxlen=maxlen,
                                              G=G)
     test_loader = data_utils.Loader(test_examples, options=options)
-    print 'Loaded %d test examples' % len(test_examples)
+    print('Loaded %d test examples' % len(test_examples))
 
     if train:
         # prepares training data.
-        print 'Loading train data...'
+        print('Loading train data...')
         train_examples = data_utils.load_examples(data_dir,
                                                   dataset='train',
                                                   keep_ratio=options[
@@ -186,12 +186,12 @@ def train(data_dir='data/memes/',
                                                   maxlen=maxlen,
                                                   G=G)
         train_loader = data_utils.Loader(train_examples, options=options)
-        print 'Loaded %d training examples.' % len(train_examples)
+        print('Loaded %d training examples.' % len(train_examples))
 
         # compiles updates.
         optimizer = downhill.build(algo='adam',
                                    loss=model['cost'],
-                                   params=tparams.values(),
+                                   params=list(tparams.values()),
                                    inputs=model['data'])
 
         updates = optimizer.get_updates(max_gradient_elem=5.,
@@ -229,7 +229,7 @@ def train(data_dir='data/memes/',
                 cost_history += [cost]
 
                 if global_step % disp_freq == 0:
-                    print 'global step %d, cost: %f' % (global_step, cost)
+                    print('global step %d, cost: %f' % (global_step, cost))
 
                 # dump model parameters.
                 if global_step % save_freq == 0:
@@ -240,9 +240,9 @@ def train(data_dir='data/memes/',
                 # evaluate on test data.
                 if global_step % test_freq == 0:
                     scores = evaluate(model['f_prob'], test_loader)
-                    print 'eval scores: ', scores
+                    print('eval scores: ', scores)
                     end_time = timeit.default_timer()
-                    print 'time used: %d seconds.' % (end_time - start_time)
+                    print('time used: %d seconds.' % (end_time - start_time))
 
                 global_step += 1
 

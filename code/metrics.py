@@ -23,7 +23,7 @@ def _retype(y_prob, y):
 
 
 def _binarize(y, n_classes=None):
-    return label_binarize(y, classes=range(n_classes))
+    return label_binarize(y, classes=list(range(n_classes)))
 
 
 def apk(actual, predicted, k=10):

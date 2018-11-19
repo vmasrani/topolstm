@@ -31,9 +31,9 @@ def load_graph(data_dir):
         G = nx.Graph()
         G.name = data_dir
         n_nodes = len(node_index)
-        G.add_nodes_from(range(n_nodes))
+        G.add_nodes_from(list(range(n_nodes)))
         with open(graph_file, 'rb') as f:
-            f.next()
+            next(f)
             for line in f:
                 u, v = line.strip().split()
                 if (u in node_index) and (v in node_index):
@@ -107,7 +107,7 @@ def load_examples(data_dir,
 
     pkl_path = os.path.join(data_dir, dataset + '.pkl')
     if os.path.isfile(pkl_path):
-        print 'pickle exists.'
+        print('pickle exists.')
         examples = pickle.load(open(pkl_path, 'rb'))
     else:
         # loads cascades
@@ -139,7 +139,7 @@ def prepare_minibatch(tuples, inference=False, options=None):
     produces a mini-batch of data in format required by model.
     '''
     seqs = [t['sequence'] for t in tuples]
-    lengths = map(len, seqs)
+    lengths = list(map(len, seqs))
     n_timesteps = max(lengths)
     n_samples = len(tuples)
 
