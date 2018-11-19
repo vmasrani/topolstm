@@ -12,10 +12,12 @@ import pickle
 from theano import config
 
 
+
 def load_graph(data_dir):
     # loads nodes observed in any cascade.
     node_file = os.path.join(data_dir, 'seen_nodes.txt')
-    with open(node_file, 'rb') as f:
+
+    with open(node_file, encoding='utf-8') as f:
         seen_nodes = [x.strip() for x in f]
 
     # builds node index
@@ -32,7 +34,7 @@ def load_graph(data_dir):
         G.name = data_dir
         n_nodes = len(node_index)
         G.add_nodes_from(list(range(n_nodes)))
-        with open(graph_file, 'rb') as f:
+        with open(graph_file, encoding='utf-8') as f:
             next(f)
             for line in f:
                 u, v = line.strip().split()
@@ -120,6 +122,7 @@ def load_examples(data_dir,
                 sequence = [query] + cascade.split(' ')[::2]
                 if maxlen is not None:
                     sequence = sequence[:maxlen]
+
                 sequence = [node_index[x] for x in sequence]
 
                 sub_examples = convert_cascade_to_examples(sequence, G=G)

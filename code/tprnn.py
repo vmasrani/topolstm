@@ -17,6 +17,9 @@ import pprint
 import data_utils
 import tprnn_model
 
+# See: https://stackoverflow.com/questions/51238578/error-non-constant-expression-cannot-be-narrowed-from-type-npy-intp-to-int
+theano.config.gcc.cxxflags = "-Wno-c++11-narrowing"
+
 
 def numpy_floatX(data):
     return np.asarray(data, dtype=config.floatX)
